@@ -51,6 +51,27 @@ public class CustomANN {
 
     }
 
+    public void removeInputNode(String removingNodeName) {
+        for (int i = 0; i < inputLayer.nodes.size(); i++) {
+            if (inputLayer.nodes.get(i).name.equals(removingNodeName)) {
+                for (int j = 0; j < hiddenLayer.nodes.size(); j++) {
+                    hiddenLayer.nodes.get(j).inputLinks.remove(i);
+                }
+                for(int k=0;k<historicalData.inputRecords.size();k++)
+                {
+                    for(int m=0;m<historicalData.inputRecords.get(k).myData.size();m++)
+                    {
+                        if(historicalData.inputRecords.get(k).myData.get(m).name.equals(removingNodeName))
+                        {
+                            historicalData.inputRecords.get(k).myData.remove(m);
+                        }
+                    }
+                }
+                inputLayer.nodes.remove(i);
+            }
+        }
+    }
+
     public void addOutputNode(String newNodeName) {
         Node node = new Node(newNodeName);
         for (int i = 0; i < hiddenLayer.nodes.size(); i++) {
@@ -86,11 +107,10 @@ public class CustomANN {
         inputLayer.activateLayer();
         hiddenLayer.activateLayer();
         outputLayer.activateLayer();
-        
-        double output[]=new double[outputLayer.nodes.size()];
-        for(int i=0;i<outputLayer.nodes.size();i++)
-        {
-            output[i]=outputLayer.nodes.get(i).outputLinks.get(0).data;
+
+        double output[] = new double[outputLayer.nodes.size()];
+        for (int i = 0; i < outputLayer.nodes.size(); i++) {
+            output[i] = outputLayer.nodes.get(i).outputLinks.get(0).data;
         }
         return output;
     }
@@ -190,10 +210,9 @@ public class CustomANN {
 //                return newError;
 //            }
 //        }
-        int numRandomIterations=15;
-        for(int i=0;i<numRandomIterations;i++)
-        {
-            input.weight=-maxWeight+Math.random()*2*maxWeight;
+        int numRandomIterations = 15;
+        for (int i = 0; i < numRandomIterations; i++) {
+            input.weight = -maxWeight + Math.random() * 2 * maxWeight;
             double changeError = evalNetwork();
             if (changeError >= initError) {
                 input.weight = originalWeight;
@@ -284,6 +303,9 @@ public class CustomANN {
             }
         }
 //        System.out.println(outputLayer.nodes.get(0).outputLinks.get(0).data);
+        double netError = evalNetwork();
+        System.out.println("***");
+        System.out.println("NetInitialError: " + netError);
         for (int i = 0; i < 20; i++) {
             updateNumericDerivative();
 //            updateBackPropagation(target);
@@ -293,8 +315,8 @@ public class CustomANN {
 //        for (int i = 0; i < outputLayer.nodes.size(); i++) {
 //            System.out.println("O" + i + ": " + Math.round(outputLayer.nodes.get(i).outputLinks.get(0).data));
 //        }
-        double netError = evalNetwork();
-        System.out.println("NetError: " + netError);
+        netError = evalNetwork();
+        System.out.println("NetFinalError: " + netError);
     }
 
 }
